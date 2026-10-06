@@ -1,0 +1,33 @@
+name: Aggiorna playlist IPTV
+
+on:
+  schedule:
+    - cron: "0 */12 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Scarica repository
+        uses: actions/checkout@v4
+
+      - name: Configura Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Genera playlist
+        run: python update.py
+
+      - name: Salva playlist aggiornata
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add playlist.m3u
+          git diff --cached --quiet || git commit -m "Aggiorna playlist IPTV"
+          git push
